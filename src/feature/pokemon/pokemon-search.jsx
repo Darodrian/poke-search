@@ -1,6 +1,6 @@
 import React from "react";
 
-const BuscadorPokemon = props => {
+const PokemonSearch = props => {
     const inputRef = React.useRef(null)
 
     const handleSubmit = event => {
@@ -17,4 +17,4 @@ const BuscadorPokemon = props => {
     )
 }
 
-export default BuscadorPokemon;
+export default PokemonSearch;

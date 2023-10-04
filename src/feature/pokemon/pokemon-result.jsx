@@ -1,9 +1,10 @@
 import React from "react";
-import { capFirstLetter, toLowerCase } from '../helpers';
-import { useGetPokemonQuery } from "../api";
+import { useGetPokemonQuery } from "../../services/api";
+import { capFirstLetter, toLowerCase } from "../../services/utils";
 
-const ResultadoPokemon = props => {
+const PokemonResult = props => {
     const { data, error, isError, isFetching } = useGetPokemonQuery(toLowerCase(props.name))
+    console.log(data);
 
     return (
         <div>
@@ -22,4 +23,4 @@ const ResultadoPokemon = props => {
     )
 }
 
-export default ResultadoPokemon;
+export default PokemonResult;
