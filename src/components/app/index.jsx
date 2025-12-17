@@ -4,21 +4,29 @@ import "./style.css";
 import { useState } from "react";
 import { Provider } from "react-redux";
 import Store from "../../services/store";
-import Buscador from "../../feature/pokemon/pokemon-search";
-import Resultado from "../../feature/pokemon/pokemon-result";
+import PokemonSearch from "../../feature/pokemon/pokemon-search";
+import PokemonResult from "../../feature/pokemon/pokemon-result";
 
 const App = () => {
   const [pokemonName, setPokemonName] = useState('pikachu');
+  const [selectedVersion, setSelectedVersion] = useState('all');
 
   return (
     <Provider store={Store}>
       <div className="App container">
         <div className="row">
-          <div className="col-12 mt-4 border-top pt-3">
-            <Buscador data={{pokemonName, setPokemonName}} />
+          <div className="col-12 col-lg-10 col-xl-8 mx-auto mt-4">
+            <PokemonSearch 
+              data={{
+                pokemonName, 
+                setPokemonName,
+                selectedVersion,
+                setSelectedVersion
+              }} 
+            />
           </div>
-          <div className="col-12">
-            <Resultado name={pokemonName} />
+          <div className="col-12 col-lg-10 col-xl-8 mx-auto">
+            <PokemonResult name={pokemonName} version={selectedVersion} />
           </div>
         </div>
       </div>
