@@ -359,17 +359,23 @@ input[type="range"]::-moz-range-thumb:hover {
   box-shadow: 0 0 8px rgba(220, 20, 60, 0.5);
 }
 
-/* Version Selector Styling */
-.form-select {
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23DC143C' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+
+/* Sprite Container - Max 4 per row */
+.sprite-container {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  justify-items: center;
 }
 
-.form-select:focus {
-  border-color: #DC143C !important;
-  box-shadow: 0 0 0 0.25rem rgba(220, 20, 60, 0.25), 0 0 10px rgba(220, 20, 60, 0.5);
+@media (max-width: 768px) {
+  .sprite-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
-.form-select option {
-  background-color: #1a1a1a;
-  color: #fff;
+@media (max-width: 480px) {
+  .sprite-container {
+    grid-template-columns: 1fr;
+  }
 }

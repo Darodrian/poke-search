@@ -9,7 +9,6 @@ import PokemonResult from "../../feature/pokemon/pokemon-result";
 
 const App = () => {
   const [pokemonName, setPokemonName] = useState('pikachu');
-  const [selectedVersion, setSelectedVersion] = useState('all');
 
   return (
     <Provider store={Store}>
@@ -19,14 +18,12 @@ const App = () => {
             <PokemonSearch 
               data={{
                 pokemonName, 
-                setPokemonName,
-                selectedVersion,
-                setSelectedVersion
+                setPokemonName
               }} 
             />
           </div>
           <div className="col-12 col-lg-10 col-xl-8 mx-auto">
-            <PokemonResult name={pokemonName} version={selectedVersion} />
+            <PokemonResult name={pokemonName} />
           </div>
         </div>
       </div>

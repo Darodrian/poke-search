@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { gameVersions } from "../../services/utils";
 
 const PokemonSearch = props => {
     const inputRef = React.useRef(null);
@@ -50,35 +49,6 @@ const PokemonSearch = props => {
                         }}>SEARCH FOR ANY POKÉMON BY NAME OR ID NUMBER</p>
                     </div>
 
-                    {/* Game Version Selector */}
-                    <div className="mb-3">
-                        <label className="text-white-50 mb-2" style={{ 
-                            fontFamily: 'monospace',
-                            letterSpacing: '1px',
-                            fontSize: '0.85rem'
-                        }}>
-                            GAME VERSION:
-                        </label>
-                        <select
-                            className="form-select form-select-lg"
-                            value={props.data.selectedVersion || 'all'}
-                            onChange={(e) => props.data.setSelectedVersion(e.target.value)}
-                            style={{
-                                backgroundColor: '#2a2a2a',
-                                color: '#fff',
-                                borderColor: '#DC143C',
-                                fontFamily: 'monospace',
-                                fontSize: '0.9rem'
-                            }}
-                        >
-                            {gameVersions.map((version) => (
-                                <option key={version.id} value={version.id} style={{ backgroundColor: '#1a1a1a' }}>
-                                    {version.name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                    
                     <form onSubmit={handleSubmit} className="mt-4">
                         <div className="input-group input-group-lg">
                             <span className="input-group-text bg-primary text-white border-primary">

@@ -1,12 +1,29 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useGetPokemonQuery } from "../../services/api";
-import { capFirstLetter, toLowerCase, getTypeColor, formatHeight, formatWeight, getStatAtLevel, getVersionSprite, gameVersions } from "../../services/utils";
+import { capFirstLetter, toLowerCase, getTypeColor, formatHeight, formatWeight, getStatAtLevel } from "../../services/utils";
 
 const PokemonResult = props => {
-    const { data, error, isError, isFetching } = useGetPokemonQuery(toLowerCase(props.name))
-    const [level, setLevel] = useState(50); // Default level 50
-    const selectedVersion = props.version || 'all';
-    const versionName = gameVersions.find(v => v.id === selectedVersion)?.name || 'All Versions';
+    const { data, error, isError, isFetching } = useGetPokemonQuery(toLowerCase(props.name));
+    const [level, setLevel] = useState(50);
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [volume, setVolume] = useState(0.5);
+    const audioRef = useRef(null);
+
+    useEffect(() => {
+        // Stop any playing audio when Pokemon changes
+        if (audioRef.current) {
+            audioRef.current.pause();
+            audioRef.current = null;
+            setIsPlaying(false);
+        }
+        
+        return () => {
+            if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current = null;
+            }
+        };
+    }, [props.name]);
 
     if (isError) {
         return (
@@ -89,8 +106,38 @@ const PokemonResult = props => {
         height, 
         weight, 
         base_experience,
-        game_indices
+        cries
     } = data;
+
+    const handlePlayCry = () => {
+        if (cries?.legacy) {
+            if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current.currentTime = 0;
+            }
+            
+            const audio = new Audio(cries.legacy);
+            audio.volume = volume;
+            audioRef.current = audio;
+            
+            audio.onplay = () => setIsPlaying(true);
+            audio.onended = () => setIsPlaying(false);
+            audio.onerror = () => setIsPlaying(false);
+            
+            audio.play().catch(err => {
+                console.error('Error playing Pokemon cry:', err);
+                setIsPlaying(false);
+            });
+        }
+    };
+
+    const handleVolumeChange = (e) => {
+        const newVolume = parseFloat(e.target.value);
+        setVolume(newVolume);
+        if (audioRef.current) {
+            audioRef.current.volume = newVolume;
+        }
+    };
 
     return (
         <div className="mt-4 pokemon-result-container">
@@ -104,14 +151,77 @@ const PokemonResult = props => {
                 <div className="card-body">
                     {/* Header with ID and Name */}
                     <div className="d-flex justify-content-between align-items-center mb-3">
-                        <div>
+                        <div className="d-flex align-items-center gap-3">
                             <h2 className="card-title mb-0">
                                 {capFirstLetter(name)}
                             </h2>
-                            {selectedVersion !== 'all' && (
-                                <small className="text-white-50" style={{ fontFamily: 'monospace', letterSpacing: '1px' }}>
-                                    VERSION: {versionName.toUpperCase()}
-                                </small>
+                            {cries?.legacy && (
+                                <div className="d-flex align-items-center gap-2">
+                                    <button
+                                        onClick={handlePlayCry}
+                                        disabled={isPlaying}
+                                        className="btn btn-sm btn-outline-danger"
+                                        title="Play Pokemon cry"
+                                        style={{
+                                            fontFamily: 'monospace',
+                                            borderColor: '#DC143C',
+                                            color: isPlaying ? '#FF4444' : '#DC143C',
+                                            minWidth: '40px',
+                                            height: '40px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            padding: 0
+                                        }}
+                                    >
+                                        {isPlaying ? (
+                                            <div className="spinner-border spinner-border-sm text-danger" role="status" style={{ width: '1rem', height: '1rem' }}>
+                                                <span className="visually-hidden">Playing...</span>
+                                            </div>
+                                        ) : (
+                                            <svg 
+                                                xmlns="http://www.w3.org/2000/svg" 
+                                                width="20" 
+                                                height="20" 
+                                                fill="currentColor" 
+                                                viewBox="0 0 16 16"
+                                            >
+                                                <path d="M11.536 14.01A8.473 8.473 0 0 0 14.026 8a8.473 8.473 0 0 0-2.49-6.01l-.708.707A7.476 7.476 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303l.708.707z"/>
+                                                <path d="M10.121 12.596A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.483 5.483 0 0 1 11.025 8a5.483 5.483 0 0 1-1.611 3.89l.707.707z"/>
+                                                <path d="M8.707 11.182A4.486 4.486 0 0 0 10.025 8a4.486 4.486 0 0 0-1.318-3.182L8 5.525A3.489 3.489 0 0 1 9.025 8 3.49 3.49 0 0 1 8 10.475l.707.707zM6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06z"/>
+                                            </svg>
+                                        )}
+                                    </button>
+                                    <div className="d-flex align-items-center gap-2" style={{ minWidth: '120px' }}>
+                                        <svg 
+                                            xmlns="http://www.w3.org/2000/svg" 
+                                            width="16" 
+                                            height="16" 
+                                            fill="currentColor" 
+                                            viewBox="0 0 16 16"
+                                            style={{ color: '#DC143C' }}
+                                        >
+                                            <path d="M11.536 14.01A8.473 8.473 0 0 0 14.026 8a8.473 8.473 0 0 0-2.49-6.01l-.708.707A7.476 7.476 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303l.708.707z"/>
+                                            <path d="M10.121 12.596A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.483 5.483 0 0 1 11.025 8a5.483 5.483 0 0 1-1.611 3.89l.707.707z"/>
+                                            <path d="M8.707 11.182A4.486 4.486 0 0 0 10.025 8a4.486 4.486 0 0 0-1.318-3.182L8 5.525A3.489 3.489 0 0 1 9.025 8 3.49 3.49 0 0 1 8 10.475l.707.707zM6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06z"/>
+                                        </svg>
+                                        <input
+                                            type="range"
+                                            className="form-range"
+                                            min="0"
+                                            max="1"
+                                            step="0.1"
+                                            value={volume}
+                                            onChange={handleVolumeChange}
+                                            title={`Volume: ${Math.round(volume * 100)}%`}
+                                            style={{
+                                                accentColor: '#DC143C',
+                                                cursor: 'pointer',
+                                                flex: 1
+                                            }}
+                                        />
+                                    </div>
+                                </div>
                             )}
                         </div>
                         <span className="badge bg-secondary fs-6">#{String(id).padStart(4, '0')}</span>
@@ -120,72 +230,105 @@ const PokemonResult = props => {
                     {/* Sprites Gallery */}
                     <div className="row mb-4">
                         <div className="col-12 mb-3">
-                            <h5 className="text-white-50 mb-2">
-                                {selectedVersion !== 'all' ? `${versionName} Sprites` : 'Sprites'}
-                            </h5>
-                            <div className="d-flex flex-wrap gap-3 justify-content-center bg-secondary bg-opacity-25 p-3 rounded">
+                            <h5 className="text-white-50 mb-2">Sprites</h5>
+                            <div className="sprite-container d-flex flex-wrap gap-3 justify-content-center bg-secondary bg-opacity-25 p-3 rounded">
                                 {(() => {
-                                    const versionSprite = getVersionSprite(sprites, selectedVersion);
-                                    return versionSprite ? (
-                                        <div className="text-center">
-                                            <img 
-                                                src={versionSprite} 
-                                                alt={`${name} ${versionName} front`}
-                                                className="bg-white rounded p-2"
-                                                style={{ width: '120px', height: '120px', objectFit: 'contain' }}
-                                            />
-                                            <p className="small mt-1 mb-0">
-                                                {selectedVersion !== 'all' ? `${versionName} Front` : 'Front'}
-                                            </p>
-                                        </div>
-                                    ) : null;
+                                    const hasFemaleVariants = sprites.front_female || sprites.back_female;
+                                    const hasShinyFemaleVariants = sprites.front_shiny_female || sprites.back_shiny_female;
+                                    
+                                    return (
+                                        <>
+                                            {sprites.front_default && (
+                                                <div className="text-center">
+                                                    <img 
+                                                        src={sprites.front_default} 
+                                                        alt={`${name} front`}
+                                                        className="bg-white rounded p-2"
+                                                        style={{ width: '120px', height: '120px', objectFit: 'contain' }}
+                                                    />
+                                                    <p className="small mt-1 mb-0">{`Front${hasFemaleVariants ? ' (♂)' : ''}`}</p>
+                                                </div>
+                                            )}
+                                            {sprites.back_default && (
+                                                <div className="text-center">
+                                                    <img 
+                                                        src={sprites.back_default} 
+                                                        alt={`${name} back`}
+                                                        className="bg-white rounded p-2"
+                                                        style={{ width: '120px', height: '120px', objectFit: 'contain' }}
+                                                    />
+                                                    <p className="small mt-1 mb-0">{`Back${hasFemaleVariants ? ' (♂)' : ''}`}</p>
+                                                </div>
+                                            )}
+                                            {sprites.front_female && (
+                                                <div className="text-center">
+                                                    <img 
+                                                        src={sprites.front_female} 
+                                                        alt={`${name} female front`}
+                                                        className="bg-white rounded p-2"
+                                                        style={{ width: '120px', height: '120px', objectFit: 'contain' }}
+                                                    />
+                                                    <p className="small mt-1 mb-0">Front (♀)</p>
+                                                </div>
+                                            )}
+                                            {sprites.back_female && (
+                                                <div className="text-center">
+                                                    <img 
+                                                        src={sprites.back_female} 
+                                                        alt={`${name} female back`}
+                                                        className="bg-white rounded p-2"
+                                                        style={{ width: '120px', height: '120px', objectFit: 'contain' }}
+                                                    />
+                                                    <p className="small mt-1 mb-0">Back (♀)</p>
+                                                </div>
+                                            )}
+                                            {sprites.front_shiny && (
+                                                <div className="text-center">
+                                                    <img 
+                                                        src={sprites.front_shiny} 
+                                                        alt={`${name} shiny front`}
+                                                        className="bg-white rounded p-2"
+                                                        style={{ width: '120px', height: '120px', objectFit: 'contain' }}
+                                                    />
+                                                    <p className="small mt-1 mb-0">{`Shiny Front${hasShinyFemaleVariants ? ' (♂)' : ''}`}</p>
+                                                </div>
+                                            )}
+                                            {sprites.back_shiny && (
+                                                <div className="text-center">
+                                                    <img 
+                                                        src={sprites.back_shiny} 
+                                                        alt={`${name} shiny back`}
+                                                        className="bg-white rounded p-2"
+                                                        style={{ width: '120px', height: '120px', objectFit: 'contain' }}
+                                                    />
+                                                    <p className="small mt-1 mb-0">{`Shiny Back${hasShinyFemaleVariants ? ' (♂)' : ''}`}</p>
+                                                </div>
+                                            )}
+                                            {sprites.front_shiny_female && (
+                                                <div className="text-center">
+                                                    <img 
+                                                        src={sprites.front_shiny_female} 
+                                                        alt={`${name} shiny female front`}
+                                                        className="bg-white rounded p-2"
+                                                        style={{ width: '120px', height: '120px', objectFit: 'contain' }}
+                                                    />
+                                                    <p className="small mt-1 mb-0">Shiny Front (♀)</p>
+                                                </div>
+                                            )}
+                                            {sprites.back_shiny_female && (
+                                                <div className="text-center">
+                                                    <img 
+                                                        src={sprites.back_shiny_female} 
+                                                        alt={`${name} shiny female back`}
+                                                        className="bg-white rounded p-2"
+                                                        style={{ width: '120px', height: '120px', objectFit: 'contain' }}
+                                                    />
+                                                    <p className="small mt-1 mb-0">Shiny Back (♀)</p>
+                                                </div>
+                                            )}
+                                        </>
+                                    );
                                 })()}
-                                {sprites.front_default && selectedVersion === 'all' && (
-                                    <>
-                                        <div className="text-center">
-                                            <img 
-                                                src={sprites.front_default} 
-                                                alt={`${name} front`}
-                                                className="bg-white rounded p-2"
-                                                style={{ width: '120px', height: '120px', objectFit: 'contain' }}
-                                            />
-                                            <p className="small mt-1 mb-0">Front</p>
-                                        </div>
-                                        {sprites.back_default && (
-                                            <div className="text-center">
-                                                <img 
-                                                    src={sprites.back_default} 
-                                                    alt={`${name} back`}
-                                                    className="bg-white rounded p-2"
-                                                    style={{ width: '120px', height: '120px', objectFit: 'contain' }}
-                                                />
-                                                <p className="small mt-1 mb-0">Back</p>
-                                            </div>
-                                        )}
-                                        {sprites.front_shiny && (
-                                            <div className="text-center">
-                                                <img 
-                                                    src={sprites.front_shiny} 
-                                                    alt={`${name} shiny front`}
-                                                    className="bg-white rounded p-2"
-                                                    style={{ width: '120px', height: '120px', objectFit: 'contain' }}
-                                                />
-                                                <p className="small mt-1 mb-0">Shiny Front</p>
-                                            </div>
-                                        )}
-                                        {sprites.back_shiny && (
-                                            <div className="text-center">
-                                                <img 
-                                                    src={sprites.back_shiny} 
-                                                    alt={`${name} shiny back`}
-                                                    className="bg-white rounded p-2"
-                                                    style={{ width: '120px', height: '120px', objectFit: 'contain' }}
-                                                />
-                                                <p className="small mt-1 mb-0">Shiny Back</p>
-                                            </div>
-                                        )}
-                                    </>
-                                )}
                             </div>
                         </div>
                     </div>
@@ -344,28 +487,6 @@ const PokemonResult = props => {
                         </div>
                     </div>
 
-                    {/* Game Versions Info */}
-                    {game_indices && game_indices.length > 0 && (
-                        <div className="mb-3">
-                            <h5 className="text-white-50 mb-2">Available In Games</h5>
-                            <div className="d-flex flex-wrap gap-2">
-                                {game_indices.slice(0, 10).map((gameIndex, index) => (
-                                    <span
-                                        key={index}
-                                        className="badge bg-success px-2 py-1"
-                                        style={{ fontSize: '0.75rem' }}
-                                    >
-                                        {capFirstLetter(gameIndex.version.name.replace('-', ' '))}
-                                    </span>
-                                ))}
-                                {game_indices.length > 10 && (
-                                    <span className="badge bg-secondary px-2 py-1" style={{ fontSize: '0.75rem' }}>
-                                        +{game_indices.length - 10} more
-                                    </span>
-                                )}
-                            </div>
-                        </div>
-                    )}
                 </div>
             </div>
         </div>
