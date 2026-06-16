@@ -6,16 +6,18 @@ A modern, interactive Pokémon search application built with React and Redux Too
 
 Pokédex Search is a web application that allows users to search and explore information about Pokémon from the official PokéAPI. The app features:
 
-- **Pokémon Search**: Search for any Pokémon by name or ID number
+- **Smart Search with Autocomplete**: Search for any Pokémon by name or ID with real-time suggestions and keyboard navigation
 - **Detailed Information**: View comprehensive Pokémon data including:
   - Multiple sprite views (front, back, shiny variants)
-  - Type information with color-coded badges
+  - Type information with color-coded badges and type effectiveness (offensive/defensive)
   - Base stats with visual progress bars
   - Calculated stats at different levels (1-100)
+  - Evolution chain display
   - Physical attributes (height, weight, base experience)
+  - Gender ratio
   - Abilities (including hidden abilities)
-  - Game version availability
-- **Game Version Selector**: Filter sprites by specific Pokémon game versions
+  - Pokédex description (genus & flavor text)
+  - Pokémon cry playback
 - **Level Calculator**: Adjust Pokémon level from 1-100 to see how stats change
 - **Modern UI**: Dark-themed interface with Bootstrap styling
 
@@ -71,14 +73,16 @@ yarn start
 - **Redux Toolkit** - State management
 - **RTK Query** - Data fetching and caching
 - **Bootstrap** - CSS framework
-- **Axios** - HTTP client
 - **PokéAPI** - Pokémon data source
 
 ## 📝 Features
 
-- Real-time Pokémon search
-- Responsive design
-- Game version filtering
+- Real-time Pokémon search with autocomplete suggestions
+- Smart type effectiveness charts (offensive & defensive)
+- Evolution chain viewer
+- Pokémon cry audio playback
+- Gender ratio display
 - Dynamic stat calculation based on level
+- Responsive design
 - Error handling for invalid searches
 - Loading states and animations
