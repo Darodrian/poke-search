@@ -23,7 +23,7 @@ const App = () => {
             />
           </div>
           <div className="col-12 col-lg-10 col-xl-8 mx-auto">
-            <PokemonResult name={pokemonName} />
+            <PokemonResult name={pokemonName} setPokemonName={setPokemonName} />
           </div>
         </div>
       </div>

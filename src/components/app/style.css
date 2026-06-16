@@ -28,8 +28,6 @@ body::before {
   display: flex;
   justify-content: center;
   padding-bottom: 2rem;
-  position: relative;
-  z-index: 1;
 }
 
 .card {
@@ -52,6 +50,7 @@ body::before {
   height: 4px;
   background: linear-gradient(90deg, transparent, #DC143C, transparent);
   opacity: 0.6;
+  border-radius: 8px 8px 0 0;
 }
 
 .card:hover {
@@ -101,8 +100,12 @@ body::before {
 
 .pokemon-search-container .card {
   border-radius: 8px;
-  overflow: hidden;
+  overflow: visible;
   background: linear-gradient(180deg, #1a1a1a 0%, #0f0f0f 100%) !important;
+}
+
+.pokemon-search-container .card:hover {
+  transform: none !important;
 }
 
 .pokemon-search-container .input-group-text {
@@ -377,5 +380,166 @@ input[type="range"]::-moz-range-thumb:hover {
 @media (max-width: 480px) {
   .sprite-container {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Type Effectiveness styling */
+.badge {
+  letter-spacing: 0.5px;
+}
+
+.text-white-50 small {
+  opacity: 0.8;
+}
+
+/* Evolution chain selectable badges */
+.evolution-chain-badge {
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.evolution-chain-badge:hover {
+  transform: scale(1.1) !important;
+  box-shadow: 0 0 14px rgba(220, 20, 60, 0.7) !important;
+}
+
+/* Gender ratio progress bar */
+.progress .progress-bar + .progress-bar {
+  border-left: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+/* Flavor text cycling buttons */
+.pokemon-result-container .btn-outline-danger:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Navigation buttons */
+.pokemon-result-container .btn-outline-danger:disabled {
+  opacity: 0.3;
+}
+
+/* Species profile badges */
+.bg-secondary.bg-opacity-25 .badge {
+  font-size: 0.75rem;
+  padding: 0.25em 0.6em;
+}
+
+/* Legendary/Mythical badges */
+.badge {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Evolution chain spacing */
+.evolution-chain-container {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* Responsive nav */
+@media (max-width: 576px) {
+  .pokemon-result-container .card-body .d-flex.justify-content-between {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 0.5rem;
+  }
+  
+  .pokemon-result-container .card-body .d-flex.justify-content-between .d-flex.align-items-center.gap-2 {
+    flex-wrap: wrap;
+  }
+}
+
+/* Autocomplete Search Wrapper */
+.search-input-wrapper {
+  position: relative;
+}
+
+/* Autocomplete Dropdown */
+.autocomplete-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: #1a1a1a;
+  border: 1px solid #DC143C;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(220, 20, 60, 0.3);
+  max-height: 360px;
+  overflow-y: auto;
+  z-index: 99999;
+  animation: fadeIn 0.15s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.autocomplete-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.1s ease;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.autocomplete-item:last-child {
+  border-bottom: none;
+  border-radius: 0 0 8px 8px;
+}
+
+.autocomplete-item:first-child {
+  border-radius: 8px 8px 0 0;
+}
+
+.autocomplete-item:hover,
+.autocomplete-item.active {
+  background-color: rgba(220, 20, 60, 0.2);
+}
+
+.autocomplete-item.active {
+  background-color: rgba(220, 20, 60, 0.3);
+  border-left: 3px solid #DC143C;
+  padding-left: calc(1rem - 3px);
+}
+
+.autocomplete-name {
+  color: #e0e0e0;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.autocomplete-item.active .autocomplete-name {
+  color: #fff;
+}
+
+.autocomplete-id {
+  color: rgba(255, 255, 255, 0.3);
+  font-family: monospace;
+  font-size: 0.75rem;
+}
+
+/* Scrollbar styling for the dropdown */
+.autocomplete-dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+
+.autocomplete-dropdown::-webkit-scrollbar-track {
+  background: #2a2a2a;
+  border-radius: 0 0 8px 0;
+}
+
+.autocomplete-dropdown::-webkit-scrollbar-thumb {
+  background: #DC143C;
+  border-radius: 3px;
+}
+
+@media (max-width: 576px) {
+  .autocomplete-dropdown {
+    max-height: 260px;
   }
 }
